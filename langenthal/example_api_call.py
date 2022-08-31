@@ -23,7 +23,4 @@ r = requests.post(url, headers=headers, cert=(clientCrt, clientKey), json=payloa
 
 print(r.status_code)
 print(r.json())
-
-
-
 # %%
