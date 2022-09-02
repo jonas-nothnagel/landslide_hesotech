@@ -2,6 +2,7 @@
 Repo to try out the data collected by Hesotech's DocuCam and IMaster technology in Langenthal.
 
 For security reasons the certificates folder is added to the .gitignore and not pushed to the repo. You have to create the folder locally and put in the key and certificate to re-run the code successfully.
+If you pull requests changes, please make sure it does not include the key and certificate files.
 
 # Notebooks
 Since this Repo is mostly for experimentation we will mostly employ jupyter notebooks. Final analyses will be put in proper scripts. 
