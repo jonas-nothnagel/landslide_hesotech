@@ -1,7 +1,6 @@
 import requests
 import copy
 import pandas as pd 
-import glob, os, sys
 
 
 def query_image(scence, layer, column, row, timestamp = "latest"):
@@ -25,7 +24,7 @@ def query_image(scence, layer, column, row, timestamp = "latest"):
     # set content as image/jpeg to obtain image
     headers = {'content-type': 'image/jpeg'}
 
-    # request picture from API. Note that we run a GET call.
+    # request picture from API. Note that we run a GET Request since we do not need to specify parameters for request.
     r = requests.get(url, headers=headers, cert=(clientCrt, clientKey))
 
     return url, r
