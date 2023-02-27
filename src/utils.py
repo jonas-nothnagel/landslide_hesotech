@@ -1,7 +1,92 @@
 import requests
 import copy
 import pandas as pd 
+from datetime import datetime
+import json 
 
+def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.000Z'),
+                site = "CameraOne", scene = "HospitalView", all_coordinates = True):
+    """
+    Returns image data as list of hyperlinks and measurements with appropriate labels as a pandas dataframe.
+
+    takes following parameter as input:
+    - start_date; end_date --> Beginn and End Date of Data Collection, if left empty will return all available data.
+    - site --> specify the Site from which data shall be returned: Possible parameters: [CameraOne, CameraTwo]. Default is CameraOne
+    - scene ---> specify Scene from which data shall be returned. Possible parameteres depending on SiteName:  
+                            [CameraOne [HospitalView]], [CameraTwo [SmallStreetSlide, FieldSlide, SchoolView]]. Default is HospitalView
+
+    - coordinates: Specify what specific tiles shall be returned of the scenes - if left empty returns all available tiles.
+                Possible parameters: 'Coordinates': [ { 'Layer': 0, 'Row': 1, 'Col': 0 }, { 'Layer': 0, 'Row': 1, 'Col': 1 } ] 
+
+    to-do: 
+    - how to know what coordinates are possible for a given site/scene?
+    - add test function to check if scene-site match and return appropriate error message.
+    """
+    # set variables
+    clientCrt = "../certificates/rw.crt"
+    clientKey = "../certificates/rw.key"
+
+    apiBaseUrl = "https://docucamrw.hesotech.eu/DocuCam/CameraOne/api/v1"
+    channelInfoUrl = apiBaseUrl + "/Data/ChannelInfo" 
+    imageApiUrl = apiBaseUrl + "/Data/ImageAndMeasurements"  # measurements are averages during scan time (scan time 5-30min)
+
+    headers = {'content-type': 'application/json'}
+
+    #request Image and Measurement Data
+    if all_coordinates == True: 
+        requestData = {
+    
+        'SiteName': site,
+        'SceneName': scene,
+        'TimeRange': {
+            'Minimum': start_date,
+            'Maximum': end_date
+        }}
+    else: 
+        requestData = {
+    
+        'SiteName': site,
+        'SceneName': scene,
+        'TimeRange': {
+            'Minimum': start_date,
+            'Maximum': end_date
+        },
+        'Coordinates': [ { 'Layer': 0, 'Row': 1, 'Col': 0 }, { 'Layer': 0, 'Row': 1, 'Col': 1 } ]  # how to adjust this???
+        }
+
+    #get labels 
+    channelResponse = requests.get(channelInfoUrl, headers=headers, cert=(clientCrt, clientKey), allow_redirects=True)
+
+    #get Iamge and Measurement Data
+    response = requests.post(
+    imageApiUrl,
+    headers=headers,
+    cert=(clientCrt, clientKey),
+    allow_redirects=True,
+    data=json.dumps(requestData)
+    )
+
+    #call APIs
+    channelInfoData = channelResponse.json()
+    data = response.json()
+    
+    # obtain measurement labels
+    skip_rate = 2
+    measurement_labels = []
+    for item in channelInfoData:
+        for index, (key, value) in enumerate(item.items()):
+            if index % skip_rate == 0:
+                measurement_labels.append(value)
+
+    # map labels with measurements and drop redundant columns
+    df = pd.DataFrame(data)
+    count = 0
+    for i in measurement_labels:
+        df[i] =df['Values'].apply(lambda x: x[count] )
+        count = count + 1
+    df = df.drop(columns=['Values'])
+
+    return df 
 
 def query_image(scence, layer, column, row, timestamp = "latest"):
 
