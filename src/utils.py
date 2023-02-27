@@ -86,6 +86,8 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
         count = count + 1
     df = df.drop(columns=['Values'])
 
+    print(start_date, end_date, site, scene)
+
     return df 
 
 def query_image(scence, layer, column, row, timestamp = "latest"):
