@@ -13,7 +13,7 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
     - start_date; end_date --> Beginn and End Date of Data Collection, if left empty will return all available data.
     - site --> specify the Site from which data shall be returned: Possible parameters: [CameraOne, CameraTwo]. Default is CameraOne
     - scene ---> specify Scene from which data shall be returned. Possible parameteres depending on SiteName:  
-                            [CameraOne [HospitalView]], [CameraTwo [SmallStreetSlide, FieldSlide, SchoolView]]. Default is HospitalView
+                            [CameraOne [HospitalView]], [CameraTwo [SmallStreetSlide, StreetSlide, SchoolView]]. Default is HospitalView
 
     - coordinates: Specify what specific tiles shall be returned of the scenes - if left empty returns all available tiles.
                 Possible parameters: 'Coordinates': [ { 'Layer': 0, 'Row': 1, 'Col': 0 }, { 'Layer': 0, 'Row': 1, 'Col': 1 } ] 
@@ -26,7 +26,11 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
     clientCrt = "../certificates/rw.crt"
     clientKey = "../certificates/rw.key"
 
-    apiBaseUrl = "https://docucamrw.hesotech.eu/DocuCam/CameraOne/api/v1"
+    if site == "CameraOne":
+        apiBaseUrl = "https://docucamrw.hesotech.eu/DocuCam/CameraOne/api/v1"
+    if site == "CameraTwo":
+        apiBaseUrl = "https://docucamrw.hesotech.eu/DocuCam/CameraTwo/api/v1"
+
     channelInfoUrl = apiBaseUrl + "/Data/ChannelInfo" 
     imageApiUrl = apiBaseUrl + "/Data/ImageAndMeasurements"  # measurements are averages during scan time (scan time 5-30min)
 
@@ -86,7 +90,8 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
         count = count + 1
     df = df.drop(columns=['Values'])
 
-    print(start_date, end_date, site, scene)
+    # add identifier for camera and scence
+    df["Site_Scence"] = site+"_"+scene 
 
     return df 
 
