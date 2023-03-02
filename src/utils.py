@@ -17,10 +17,6 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
 
     - coordinates: Specify what specific tiles shall be returned of the scenes - if left empty returns all available tiles.
                 Possible parameters: 'Coordinates': [ { 'Layer': 0, 'Row': 1, 'Col': 0 }, { 'Layer': 0, 'Row': 1, 'Col': 1 } ] 
-
-    to-do: 
-    - how to know what coordinates are possible for a given site/scene?
-    - add test function to check if scene-site match and return appropriate error message.
     """
     # set variables
     clientCrt = "../certificates/rw.crt"
