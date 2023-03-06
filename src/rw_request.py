@@ -35,7 +35,10 @@ def return_data(start_date: str = '2022-01-01T00:00:00.000Z',
     Raises:
         ValueError: If site and scene parameters do not match.
     """
-        
+    CLIENT_CRT = "../certificates/rw.crt"
+    CLIENT_KEY = "../certificates/rw.key"
+    HEADERS = {'content-type': 'application/json'}
+
     clientCrt = CLIENT_CRT
     clientKey = CLIENT_KEY
     apiBaseUrl = f"https://docucamrw.hesotech.eu/DocuCam/{site}/api/v1"
@@ -62,18 +65,20 @@ def return_data(start_date: str = '2022-01-01T00:00:00.000Z',
     channelInfoUrl = f"{apiBaseUrl}/Data/ChannelInfo"
     imageApiUrl = f"{apiBaseUrl}/Data/ImageAndMeasurements"
 
-    channelResponse = requests.get(channelInfoUrl, headers=headers, cert=(clientCrt, clientKey))
-    response = requests.post(imageApiUrl, headers=headers, cert=(clientCrt, clientKey), data=json.dumps(requestData))
-    
+    channelResponse = requests.get(channelInfoUrl, headers=headers, cert=(clientCrt, clientKey), allow_redirects=True)
+    response = requests.post(imageApiUrl, headers=headers, cert=(clientCrt, clientKey), allow_redirects=True, data=json.dumps(requestData))
+
     channelInfoData = channelResponse.json()
     data = response.json()
-    
+    df = pd.DataFrame(data)
+
     measurement_labels = [v for i, item in enumerate(channelInfoData) for j, (k, v) in enumerate(item.items()) if j % 2 == 0]
-    df = pd.DataFrame(data).drop(columns=['Values'])
     
     for i, label in enumerate(measurement_labels):
         df[label] = df['Values'].apply(lambda x: x[i])
         
+    df = df.drop(columns=['Values'])
+
     df['Site_Scence'] = f"{site}_{scene}"
     
     return df
