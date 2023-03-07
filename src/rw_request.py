@@ -7,6 +7,8 @@ import json
 # Constants
 CLIENT_CRT = "../certificates/rw.crt"
 CLIENT_KEY = "../certificates/rw.key"
+LIST_COORDINATES = "../data/coordinates.json"
+
 HEADERS = {'content-type': 'application/json'}
 
 def return_data(start_date: str = '2022-01-01T00:00:00.000Z', 
@@ -60,7 +62,11 @@ def return_data(start_date: str = '2022-01-01T00:00:00.000Z',
     }
     
     if not all_coordinates:
-        requestData['Coordinates'] = [{'Layer': 0, 'Row': 1, 'Col': 0}, {'Layer': 0, 'Row': 1, 'Col': 1}]
+        #requestData['Coordinates'] = [{'Layer': 0, 'Row': 1, 'Col': 0}, {'Layer': 0, 'Row': 1, 'Col': 1}]
+
+        with open("../data/coordinates.json") as json_file:
+           json_data = json.load(json_file)
+        requestData['Coordinates'] = json_data
     
     channelInfoUrl = f"{apiBaseUrl}/Data/ChannelInfo"
     imageApiUrl = f"{apiBaseUrl}/Data/ImageAndMeasurements"
