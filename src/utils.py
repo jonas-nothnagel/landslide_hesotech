@@ -52,7 +52,7 @@ def return_data(start_date = '2022-01-01T00:00:00.000Z', end_date = datetime.utc
             'Maximum': end_date
         },
         # note that coordinates start at index 0 here opposed to the GUI where index starts at 1. 
-        'Coordinates': [ { 'Layer': 1, 'Row': 3, 'Col': 1} ]  # how to adjust this???
+        'Coordinates': [ { 'Layer': 4, 'Row': 18, 'Col': 18} ]  # how to adjust this???
         }
 
     #get labels 
